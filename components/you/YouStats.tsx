@@ -1,14 +1,14 @@
 import React from "react";
 import { StyleSheet, View, Text } from "react-native";
 
-interface ProfileStatsProps {
+interface YouStatsProps {
   collections: number;
   history: number;
   following: number;
   vouchers: number;
 }
 
-const ProfileStats: React.FC<ProfileStatsProps> = ({
+const YouStats: React.FC<YouStatsProps> = ({
   collections,
   history,
   following,
@@ -27,10 +27,6 @@ const ProfileStats: React.FC<ProfileStatsProps> = ({
       <View style={styles.statItem}>
         <Text style={styles.statNumber}>{following}</Text>
         <Text style={styles.statLabel}>Following</Text>
-      </View>
-      <View style={styles.statItem}>
-        <Text style={styles.statNumber}>{vouchers}</Text>
-        <Text style={styles.statLabel}>Vouchers</Text>
       </View>
     </View>
   );
@@ -59,4 +55,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProfileStats;
+export default YouStats;

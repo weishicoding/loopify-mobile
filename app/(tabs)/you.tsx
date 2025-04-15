@@ -2,12 +2,13 @@ import React from "react";
 import { StyleSheet, ScrollView, View } from "react-native";
 
 // Import components
-import ProfileHeader from "@/components/profile/ProfileHeader";
-import ProfileStats from "@/components/profile/ProfileStats";
-import TipsSection from "@/components/profile/TipsSection";
-import TransactionMenu from "@/components/profile/TransactionMenu";
+import YouHeader from "@/components/you/YouHeader";
+import YouStats from "@/components/you/YouStats";
+import TipsSection from "@/components/you/TipsSection";
+import TransactionMenu from "@/components/you/TransactionMenu";
+import Address from "@/components/you/Address";
 
-interface ProfileData {
+interface YouData {
   username: string;
   points: number;
   stats: {
@@ -18,11 +19,12 @@ interface ProfileData {
   };
   purchasedCount: number;
   tip: string;
+  messageCounts: number;
 }
 
-const ProfilePage: React.FC = () => {
+const YouPage: React.FC = () => {
   // You can manage your profile data here
-  const profileData: ProfileData = {
+  const profileData: YouData = {
     username: "tbNick_x7k72",
     points: 575,
     stats: {
@@ -33,18 +35,19 @@ const ProfilePage: React.FC = () => {
     },
     purchasedCount: 4,
     tip: "When buying on Taobao, quickly check the value to see how much it costs",
+    messageCounts: 12,
   };
 
   return (
     <View style={styles.container}>
       <ScrollView>
-        <ProfileHeader
+        <YouHeader
           username={profileData.username}
           points={profileData.points}
         />
 
         <View style={styles.contextContiner}>
-          <ProfileStats
+          <YouStats
             collections={profileData.stats.collections}
             history={profileData.stats.history}
             following={profileData.stats.following}
@@ -54,6 +57,7 @@ const ProfilePage: React.FC = () => {
           <TipsSection tipText={profileData.tip} />
 
           <TransactionMenu purchasedCount={profileData.purchasedCount} />
+          <Address />
         </View>
       </ScrollView>
     </View>
@@ -70,4 +74,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProfilePage;
+export default YouPage;

@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, View, Text } from "react-native";
-import { Ionicons, FontAwesome, MaterialIcons } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 
 interface TransactionMenuProps {
   purchasedCount: number;
@@ -11,39 +11,21 @@ const TransactionMenu: React.FC<TransactionMenuProps> = ({
 }) => {
   return (
     <View style={styles.transactionSection}>
-      <Text style={styles.sectionTitle}>My Transactions</Text>
+      <Text style={styles.sectionTitle}>My Trades</Text>
       <View style={styles.transactionMenu}>
         <View style={styles.menuItem}>
-          <View style={styles.menuIconContainer}>
-            <Ionicons name="document-outline" size={24} color="#333" />
-          </View>
-          <Text style={styles.menuLabel}>Items I Posted</Text>
+          <Ionicons name="bag-handle-outline" size={24} color="black" />
+          <Text style={styles.menuLabel}>Posted</Text>
         </View>
 
         <View style={styles.menuItem}>
-          <View style={styles.menuIconContainer}>
-            <FontAwesome name="dollar" size={24} color="#333" />
-          </View>
-          <Text style={styles.menuLabel}>Items I Sold</Text>
+          <Ionicons name="file-tray-full-outline" size={24} color="black" />
+          <Text style={styles.menuLabel}>Sold</Text>
         </View>
 
         <View style={styles.menuItem}>
-          <View style={styles.menuIconContainer}>
-            <MaterialIcons name="shopping-bag" size={24} color="#333" />
-          </View>
-          <Text style={styles.menuLabel}>Items I Purchased</Text>
-          {purchasedCount > 0 && (
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>{purchasedCount}</Text>
-            </View>
-          )}
-        </View>
-
-        <View style={styles.menuItem}>
-          <View style={styles.menuIconContainer}>
-            <MaterialIcons name="rate-review" size={24} color="#333" />
-          </View>
-          <Text style={styles.menuLabel}>Awaiting Review</Text>
+          <Ionicons name="basket-outline" size={24} color="black" />
+          <Text style={styles.menuLabel}>Purchased {purchasedCount}</Text>
         </View>
       </View>
     </View>
@@ -65,6 +47,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
   },
   transactionMenu: {
+    marginTop: 10,
     flexDirection: "row",
     justifyContent: "space-around",
   },
@@ -86,6 +69,7 @@ const styles = StyleSheet.create({
     borderColor: "#eee",
   },
   menuLabel: {
+    marginTop: 10,
     fontSize: 12,
     color: "#333",
     textAlign: "center",

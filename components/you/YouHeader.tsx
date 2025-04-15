@@ -1,27 +1,28 @@
 import React from "react";
-import { StyleSheet, View, Image, Text, TouchableOpacity } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 
-interface ProfileHeaderProps {
+interface YouHeaderProps {
   username: string;
   points: number;
 }
 
-const ProfileHeader: React.FC<ProfileHeaderProps> = ({ username, points }) => {
+const YouHeader: React.FC<YouHeaderProps> = ({ username, points }) => {
   return (
     <View style={styles.profileHeader}>
-      <View style={styles.profileLeftSection}>
+      <TouchableOpacity style={styles.profileLeftSection}>
         <Image
-          source={{ uri: "https://via.placeholder.com/50" }}
+          source="https://picsum.photos/seed/696/3000/2000"
           style={styles.profileImage}
+          contentFit="cover"
         />
         <View style={styles.profileInfo}>
           <Text style={styles.username}>{username}</Text>
-          <Text style={styles.points}>{points} points</Text>
         </View>
-      </View>
+      </TouchableOpacity>
       <TouchableOpacity style={styles.settingsButton}>
-        <Ionicons name="settings-outline" size={24} color="#333" />
+        <Ionicons name="settings-outline" size={20} color="black" />
       </TouchableOpacity>
     </View>
   );
@@ -62,4 +63,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProfileHeader;
+export default YouHeader;

@@ -1,8 +1,10 @@
 import { Tabs } from "expo-router";
 import React from "react";
-import Feather from "@expo/vector-icons/Feather";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function TabLayout() {
+  const purchasedCount = 12;
   return (
     <Tabs
       screenOptions={{
@@ -14,16 +16,7 @@ export default function TabLayout() {
         options={{
           title: "Home",
           tabBarIcon: ({ color }) => (
-            <Feather name="home" size={24} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="location"
-        options={{
-          title: "Location",
-          tabBarIcon: ({ color }) => (
-            <Feather name="map-pin" size={24} color={color} />
+            <Ionicons name="home-outline" size={24} color={color} />
           ),
         }}
       />
@@ -32,7 +25,7 @@ export default function TabLayout() {
         options={{
           title: "Sell",
           tabBarIcon: ({ color }) => (
-            <Feather name="plus-circle" size={24} color={color} />
+            <Ionicons name="add-circle-outline" size={24} color={color} />
           ),
         }}
       />
@@ -41,19 +34,45 @@ export default function TabLayout() {
         options={{
           title: "Messages",
           tabBarIcon: ({ color }) => (
-            <Feather name="message-circle" size={24} color={color} />
+            <>
+              <Ionicons name="chatbubble-outline" size={24} color={color} />
+              {purchasedCount > 0 && (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>{purchasedCount}</Text>
+                </View>
+              )}
+            </>
           ),
         }}
       />
       <Tabs.Screen
-        name="profile"
+        name="you"
         options={{
-          title: "Profile",
+          title: "You",
           tabBarIcon: ({ color }) => (
-            <Feather name="user" size={24} color={color} />
+            <Ionicons name="person-outline" size={24} color={color} />
           ),
         }}
       />
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  badge: {
+    position: "absolute",
+    right: -4,
+    top: 0,
+    backgroundColor: "#ff3b30",
+    width: 16,
+    height: 16,
+    borderRadius: 9,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  badgeText: {
+    color: "#fff",
+    fontSize: 9,
+    fontWeight: "medium",
+  },
+});
