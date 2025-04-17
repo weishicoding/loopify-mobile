@@ -7,6 +7,8 @@ import YouStats from "@/components/you/YouStats";
 import TipsSection from "@/components/you/TipsSection";
 import TransactionMenu from "@/components/you/TransactionMenu";
 import Address from "@/components/you/Address";
+import SafeAreaWrapper from "@/components/SafeAreaWrapper";
+import { useTheme } from "@/context/ThemeContext";
 
 interface YouData {
   username: string;
@@ -23,6 +25,8 @@ interface YouData {
 }
 
 const YouPage: React.FC = () => {
+  const { theme } = useTheme();
+  const styles = createStyle(theme);
   // You can manage your profile data here
   const profileData: YouData = {
     username: "tbNick_x7k72",
@@ -39,39 +43,42 @@ const YouPage: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <ScrollView>
-        <YouHeader
-          username={profileData.username}
-          points={profileData.points}
-        />
-
-        <View style={styles.contextContiner}>
-          <YouStats
-            collections={profileData.stats.collections}
-            history={profileData.stats.history}
-            following={profileData.stats.following}
-            vouchers={profileData.stats.vouchers}
+    <SafeAreaWrapper>
+      <View style={styles.container}>
+        <ScrollView>
+          <YouHeader
+            username={profileData.username}
+            points={profileData.points}
           />
 
-          <TipsSection tipText={profileData.tip} />
+          <View style={styles.contextContiner}>
+            <YouStats
+              collections={profileData.stats.collections}
+              history={profileData.stats.history}
+              following={profileData.stats.following}
+              vouchers={profileData.stats.vouchers}
+            />
 
-          <TransactionMenu purchasedCount={profileData.purchasedCount} />
-          <Address />
-        </View>
-      </ScrollView>
-    </View>
+            <TipsSection tipText={profileData.tip} />
+
+            <TransactionMenu purchasedCount={profileData.purchasedCount} />
+            <Address />
+          </View>
+        </ScrollView>
+      </View>
+    </SafeAreaWrapper>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f5f5f5",
-  },
-  contextContiner: {
-    paddingHorizontal: 10,
-  },
-});
+const createStyle = (theme: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.surface,
+    },
+    contextContiner: {
+      paddingHorizontal: theme.spacing.sm,
+    },
+  });
 
 export default YouPage;

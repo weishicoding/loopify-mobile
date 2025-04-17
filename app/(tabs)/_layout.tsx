@@ -1,9 +1,28 @@
-import { Tabs } from "expo-router";
-import React from "react";
+import { Redirect, Tabs, useRouter } from "expo-router";
+import React, { useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useAuth } from "@/context/AuthProvider";
+import { useTheme } from "@/context/ThemeContext";
 
 export default function TabLayout() {
+  const { userToken, isLoading } = useAuth(); // Get auth state and loading status
+  const { theme } = useTheme();
+  const router = useRouter();
+
+  // useEffect(() => {
+  //   if (!isLoading && !userToken) {
+  //     router.replace("/(auth)/login");
+  //   }
+  // }, [userToken, isLoading, router]);
+
+  // if (isLoading) {
+  //   return null;
+  // }
+
+  // if (!userToken) {
+  //   return <Redirect href="/(auth)/login" />;
+  // }
   const purchasedCount = 12;
   return (
     <Tabs

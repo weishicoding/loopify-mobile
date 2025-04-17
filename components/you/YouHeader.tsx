@@ -2,6 +2,7 @@ import React from "react";
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
+import { router } from "expo-router";
 
 interface YouHeaderProps {
   username: string;
@@ -11,7 +12,10 @@ interface YouHeaderProps {
 const YouHeader: React.FC<YouHeaderProps> = ({ username, points }) => {
   return (
     <View style={styles.profileHeader}>
-      <TouchableOpacity style={styles.profileLeftSection}>
+      <TouchableOpacity
+        style={styles.profileLeftSection}
+        onPress={() => router.push("/profile")}
+      >
         <Image
           source="https://picsum.photos/seed/696/3000/2000"
           style={styles.profileImage}
