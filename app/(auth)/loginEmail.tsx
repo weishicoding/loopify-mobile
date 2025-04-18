@@ -1,4 +1,3 @@
-// LoginScreen.tsx
 import React, { useState } from "react";
 import {
   StyleSheet,
@@ -9,18 +8,71 @@ import {
   TouchableOpacity,
   TextInput,
 } from "react-native";
-import { useTheme } from "@/context/ThemeContext";
+import { useTheme } from "@/context/ThemeProvider";
 import GoogleColorLogo from "@/assets/images/icons8-google.svg";
 import { router } from "expo-router";
+import apiClient from "@/api/apiClient";
 
 const LoginEmail: React.FC = () => {
   const [email, setEmail] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const { theme } = useTheme();
-  const styles = createStyles(theme);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const styles = createStyles(theme, error);
 
-  const requestCode = () => {
-    router.push("/loginCodeVerify");
+  const requestCode = async () => {
+    if (isLoading) return;
+    const validation = validateEmail(email);
+
+    if (!validation.isValid) {
+      setError(validation.message);
+      return;
+    } else {
+      setError(null);
+    }
+
+    setIsLoading(true);
+    try {
+      await apiClient.post("/auth/request-code", {
+        email: email,
+      });
+      setIsLoading(false);
+      router.push({
+        pathname: "/(auth)/loginCodeVerify",
+        params: { email: email },
+      });
+    } catch (e: any) {
+      setIsLoading(false);
+      console.log(e.message || "An error occured");
+      return;
+    }
   };
+  const handleEmailChange = (text: string) => {
+    setError(null);
+    setEmail(text);
+  };
+
+  const isValidEmail = (email: string): boolean => {
+    // Regular expression for validating email
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    return emailRegex.test(email);
+  };
+
+  const validateEmail = (
+    email: string
+  ): { isValid: boolean; message: string } => {
+    if (!email || email.trim() === "") {
+      return { isValid: false, message: "Please enter your email." };
+    }
+
+    if (!isValidEmail(email)) {
+      return { isValid: false, message: "Please enter a valid email address." };
+    }
+
+    return { isValid: true, message: "" };
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
@@ -50,10 +102,11 @@ const LoginEmail: React.FC = () => {
               keyboardType="email-address"
               returnKeyType="done"
               value={email}
-              onChangeText={setEmail}
+              onChangeText={(text) => handleEmailChange(text)}
             />
           </View>
         </View>
+        {error && <Text style={styles.emailInputError}>{error}</Text>}
 
         {/* Continue Button */}
         <TouchableOpacity
@@ -79,7 +132,7 @@ const LoginEmail: React.FC = () => {
   );
 };
 
-const createStyles = (theme: any) =>
+const createStyles = (theme: any, error: string | null) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -119,7 +172,7 @@ const createStyles = (theme: any) =>
     },
     emailInputContainer: {
       flexDirection: "row",
-      marginBottom: 20,
+      marginBottom: 5,
     },
     emailInput: {
       flex: 1,
@@ -129,6 +182,12 @@ const createStyles = (theme: any) =>
       borderColor: theme.colors.accent,
       borderRadius: 12,
       paddingHorizontal: 15,
+      marginBottom: error ? 5 : 20,
+    },
+    emailInputError: {
+      fontSize: 14,
+      color: theme.colors.error,
+      marginBottom: 20,
     },
     input: {
       flex: 1,
@@ -168,7 +227,7 @@ const createStyles = (theme: any) =>
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
-      backgroundColor: "#f0f0f0",
+      backgroundColor: theme.colors.surfaceVariant,
       borderRadius: 12,
       paddingVertical: 14,
     },

@@ -19,6 +19,6 @@ export default function StartPage() {
   if (userToken) {
     return <Redirect href="/(tabs)/you" />;
   } else {
-    return <Redirect href="/(auth)/loginCodeVerify" />;
+    return <Redirect href="/(auth)/loginEmail" />;
   }
 }

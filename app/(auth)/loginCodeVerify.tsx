@@ -10,26 +10,37 @@ import {
   KeyboardAvoidingView,
   Platform,
   Keyboard,
+  Modal,
+  Animated,
+  Dimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
-import { useTheme } from "@/context/ThemeContext";
+import { useTheme } from "@/context/ThemeProvider";
 import { useAuth } from "@/context/AuthProvider";
+import Toast from "@/components/Toast";
+import apiClient from "@/api/apiClient";
 
 export default function loginCodeVerify() {
+  const { height } = Dimensions.get("window");
   const [code, setCode] = useState<string[]>(["", "", "", ""]);
   const [focusedIndex, setFocusedIndex] = useState<number | null>(0); // Track focused input
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [resendModalVisible, setResendModalVisible] = useState(false);
+  const slideAnim = useRef(new Animated.Value(height)).current;
+
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
 
   const inputRefs = useRef<(TextInput | null)[]>([]);
   const { signIn } = useAuth();
 
   const params = useLocalSearchParams<{ email: string }>();
-  const email = params.email || "your@default-email.com";
+  const email = params.email || "your@example-email.com";
 
   const { theme } = useTheme();
-  const styles = createStyles(theme, focusedIndex, code, error);
+  const styles = createStyles(theme);
 
   // Focus first input on mount
   useEffect(() => {
@@ -37,13 +48,17 @@ export default function loginCodeVerify() {
     setFocusedIndex(0);
   }, []);
 
-  // Check if code is complete for auto-submission
   useEffect(() => {
     const enteredCode = code.join("");
     if (enteredCode.length === code.length) {
       handleVerify(enteredCode);
     }
   }, [code]);
+
+  const showToast = (message: string) => {
+    setToastMessage(message);
+    setToastVisible(true);
+  };
 
   const handleCodeChange = (text: string, index: number) => {
     const digit = text.replace(/[^0-9]/g, "");
@@ -56,7 +71,6 @@ export default function loginCodeVerify() {
     if (digit.length === 1 && index < code.length - 1) {
       inputRefs.current[index + 1]?.focus();
     }
-    // If the last digit is entered, verification will trigger via useEffect
   };
 
   const handleKeyPress = (
@@ -77,28 +91,11 @@ export default function loginCodeVerify() {
 
   const handleFocus = (index: number) => {
     setFocusedIndex(index);
-    setError(null); // Clear error on focus
+    setError(null);
   };
 
   const handleResend = async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const response = await fetch("/api/auth/request-code", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email }),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to resend code.");
-      }
-      setCode(["", "", "", ""]); // Clear inputs
-      inputRefs.current[0]?.focus(); // Focus first input
-    } catch (err: any) {
-      setError(err.message || "Could not resend code.");
-    } finally {
-      setIsLoading(false);
-    }
+    showResendModal();
   };
 
   const handleVerify = async (enteredCode: string) => {
@@ -109,24 +106,14 @@ export default function loginCodeVerify() {
     setError(null);
 
     try {
-      const response = await fetch("/api/auth/verify-code", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email, code: enteredCode }),
+      const response = await apiClient.post("/auth/verify-code", {
+        email: email,
+        code: enteredCode,
       });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || "Verification failed.");
-      }
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate network delay
-      if (enteredCode !== "1234") {
-        throw new Error("The email code is incorrect.");
-      }
-      const mockToken = "fake-jwt-token-" + Date.now(); // Mock token
+      const data = response.data;
 
-      await signIn(mockToken);
+      await signIn(data.accessToken);
     } catch (err: any) {
-      console.error("Verification error:", err);
       setError(err.message || "An error occurred during verification.");
       setCode(["", "", "", ""]);
       inputRefs.current[0]?.focus();
@@ -142,6 +129,43 @@ export default function loginCodeVerify() {
     }
   };
 
+  const showResendModal = () => {
+    setResendModalVisible(true);
+    Animated.timing(slideAnim, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const hideResendModal = () => {
+    Animated.timing(slideAnim, {
+      toValue: height,
+      duration: 300,
+      useNativeDriver: true,
+    }).start(() => {
+      setResendModalVisible(false);
+    });
+  };
+
+  const handleResendCode = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await apiClient.post("/auth/request-code", {
+        email: email,
+      });
+      setCode(["", "", "", ""]); // Clear inputs
+      inputRefs.current[0]?.focus(); // Focus first input
+    } catch (err: any) {
+      setError(err.message || "Could not resend code.");
+    } finally {
+      setIsLoading(false);
+    }
+    hideResendModal();
+    showToast("Email code has been re-sent!");
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
@@ -149,7 +173,6 @@ export default function loginCodeVerify() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.content}
       >
-        {/* Back Button (Top Left) */}
         <TouchableOpacity style={styles.backButtonTop} onPress={handleBack}>
           <Ionicons
             name="chevron-back-outline"
@@ -184,7 +207,7 @@ export default function loginCodeVerify() {
                 keyboardType="number-pad"
                 ref={(el) => (inputRefs.current[index] = el as TextInput)}
                 maxLength={1}
-                editable={!isLoading} // Disable input while loading
+                editable={!isLoading}
               />
             ))}
           </View>
@@ -199,16 +222,56 @@ export default function loginCodeVerify() {
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
+      {/* Resend Modal */}
+      <Modal
+        visible={resendModalVisible}
+        transparent={true}
+        animationType="none"
+        onRequestClose={hideResendModal}
+      >
+        <View style={styles.modalOverlay}>
+          <TouchableOpacity
+            style={styles.overlayBackground}
+            activeOpacity={1}
+            onPress={hideResendModal}
+          />
+          <Animated.View
+            style={[
+              styles.modalContent,
+              { transform: [{ translateY: slideAnim }] },
+            ]}
+          >
+            <View style={styles.modalBody}>
+              <Text style={styles.modalTitle}>Resend code to:</Text>
+              <Text style={styles.modalEmail}>{email}</Text>
+
+              <TouchableOpacity
+                style={styles.resendConfirmButton}
+                onPress={handleResendCode}
+              >
+                <Text style={styles.resendConfirmText}>Resend</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={hideResendModal}
+              >
+                <Text style={styles.cancelText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
+        </View>
+      </Modal>
+      <Toast
+        visible={toastVisible}
+        message={toastMessage}
+        onDismiss={() => setToastVisible(false)}
+      />
     </SafeAreaView>
   );
 }
 
-const createStyles = (
-  theme: any,
-  focusedIndex: number | null,
-  code: string[],
-  error: string | null
-) =>
+const createStyles = (theme: any) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -216,10 +279,9 @@ const createStyles = (
     },
     backButtonTop: {
       position: "absolute",
-      top: Platform.OS === "ios" ? 20 : 10, // Adjust as needed
+      top: Platform.OS === "ios" ? 20 : 10,
       left: theme.spacing.md,
       zIndex: 10,
-      //   padding: theme.spacing.xs, // Add padding for easier tap
     },
     content: {
       flex: 1,
@@ -321,5 +383,61 @@ const createStyles = (
       color: theme.colors.error,
       fontSize: 14,
       marginBottom: 10,
+    },
+    // Modal styles
+    modalOverlay: {
+      flex: 1,
+      justifyContent: "flex-end",
+    },
+    overlayBackground: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+    },
+    modalContent: {
+      backgroundColor: theme.colors.background,
+      borderTopLeftRadius: 24,
+      borderTopRightRadius: 24,
+      paddingTop: 20,
+      paddingHorizontal: 20,
+      paddingBottom: 30,
+    },
+    modalBody: {
+      alignItems: "center",
+    },
+    modalTitle: {
+      fontSize: 14,
+      marginBottom: 10,
+    },
+    modalEmail: {
+      fontSize: 14,
+      marginBottom: 20,
+    },
+    resendConfirmButton: {
+      backgroundColor: theme.colors.primary,
+      width: "100%",
+      paddingVertical: 14,
+      borderRadius: 12,
+      alignItems: "center",
+      marginBottom: 12,
+    },
+    resendConfirmText: {
+      color: theme.colors.textOnPrimary,
+      fontSize: 14,
+      fontWeight: "500",
+    },
+    cancelButton: {
+      backgroundColor: theme.colors.surfaceVariant,
+      width: "100%",
+      paddingVertical: 14,
+      borderRadius: 12,
+      alignItems: "center",
+    },
+    cancelText: {
+      fontSize: 14,
+      fontWeight: "500",
     },
   });

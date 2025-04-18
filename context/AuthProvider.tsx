@@ -6,12 +6,12 @@ import React, {
   ReactNode,
 } from "react";
 import * as SecureStore from "expo-secure-store";
-import { useRouter } from "expo-router"; // Import useRouter
+import apiClient from "@/api/apiClient";
 
-const AUTH_TOKEN_KEY = "userAuthToken";
+const ACCESS_TOKEN_KEY = "userAuthToken";
 
 interface AuthContextType {
-  signIn: (token: string) => Promise<void>;
+  signIn: (accessToken: string) => Promise<void>;
   signOut: () => Promise<void>;
   userToken: string | null;
   isLoading: boolean;
@@ -22,13 +22,13 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [userToken, setUserToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter(); // Get router instance
 
   useEffect(() => {
     const loadToken = async () => {
+      let storedAccessToken: string | null = null;
       try {
-        const storedToken = await SecureStore.getItemAsync(AUTH_TOKEN_KEY);
-        setUserToken(storedToken);
+        storedAccessToken = await SecureStore.getItemAsync(ACCESS_TOKEN_KEY);
+        setUserToken(storedAccessToken);
       } catch (e) {
         console.error("Failed to load auth token", e);
       } finally {
@@ -38,10 +38,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     loadToken();
   }, []);
 
-  const signIn = async (token: string) => {
+  const signIn = async (accessToken: string) => {
     try {
-      await SecureStore.setItemAsync(AUTH_TOKEN_KEY, token);
-      setUserToken(token);
+      await SecureStore.setItemAsync(ACCESS_TOKEN_KEY, accessToken);
+      setUserToken(accessToken);
     } catch (e) {
       console.error("Failed to save auth token", e);
     }
@@ -49,10 +49,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signOut = async () => {
     try {
-      await SecureStore.deleteItemAsync(AUTH_TOKEN_KEY);
-      setUserToken(null);
-    } catch (e) {
-      console.error("Failed to delete auth token", e);
+      await apiClient.post("/auth/logout");
+    } catch (e: any) {
+      console.error(
+        "Backend logout call failed",
+        e?.response?.data || e.message
+      );
+    } finally {
+      try {
+        await SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY);
+        setUserToken(null);
+      } catch (e) {
+        console.error("Failed to delete access token during logout", e);
+      }
     }
   };
 

@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/context/AuthProvider";
-import { useTheme } from "@/context/ThemeContext";
+import { useTheme } from "@/context/ThemeProvider";
 
 export default function TabLayout() {
   const { userToken, isLoading } = useAuth(); // Get auth state and loading status

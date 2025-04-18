@@ -8,7 +8,7 @@ import TipsSection from "@/components/you/TipsSection";
 import TransactionMenu from "@/components/you/TransactionMenu";
 import Address from "@/components/you/Address";
 import SafeAreaWrapper from "@/components/SafeAreaWrapper";
-import { useTheme } from "@/context/ThemeContext";
+import { useTheme } from "@/context/ThemeProvider";
 
 interface YouData {
   username: string;

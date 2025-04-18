@@ -4,7 +4,7 @@ import {
   SafeAreaProvider,
   initialWindowMetrics,
 } from "react-native-safe-area-context";
-import { ThemeProvider } from "@/context/ThemeContext";
+import { ThemeProvider } from "@/context/ThemeProvider";
 import { AuthProvider } from "@/context/AuthProvider";
 
 export default function RootLayout() {
