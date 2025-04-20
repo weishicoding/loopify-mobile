@@ -1,7 +1,6 @@
 import React from "react";
 import { StyleSheet, ScrollView, View } from "react-native";
 
-// Import components
 import YouHeader from "@/components/you/YouHeader";
 import YouStats from "@/components/you/YouStats";
 import TipsSection from "@/components/you/TipsSection";
@@ -9,6 +8,9 @@ import TransactionMenu from "@/components/you/TransactionMenu";
 import Address from "@/components/you/Address";
 import SafeAreaWrapper from "@/components/SafeAreaWrapper";
 import { useTheme } from "@/context/ThemeProvider";
+import { lightTheme } from "@/theme/theme";
+
+type Theme = typeof lightTheme;
 
 interface YouData {
   username: string;
@@ -70,14 +72,14 @@ const YouPage: React.FC = () => {
   );
 };
 
-const createStyle = (theme: any) =>
+const createStyle = (theme: Theme) =>
   StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: theme.colors.surface,
     },
     contextContiner: {
-      paddingHorizontal: theme.spacing.sm,
+      paddingHorizontal: theme.spacing.xs,
     },
   });
 

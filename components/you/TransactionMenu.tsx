@@ -39,6 +39,11 @@ const styles = StyleSheet.create({
     paddingTop: 15,
     paddingBottom: 5,
     borderRadius: 15,
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   sectionTitle: {
     fontSize: 16,

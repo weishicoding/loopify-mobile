@@ -43,3 +43,5 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
 };
 
 export const useTheme = () => useContext(ThemeContext);
+
+export type Theme = typeof lightTheme | typeof darkTheme;
