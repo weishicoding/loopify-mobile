@@ -1,5 +1,6 @@
 import { View, Text } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
+import apiClient from "@/api/apiClient";
 
 export default function Message() {
   return (

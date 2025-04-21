@@ -24,7 +24,7 @@ import apiClient from "@/api/apiClient";
 export default function loginCodeVerify() {
   const { height } = Dimensions.get("window");
   const [code, setCode] = useState<string[]>(["", "", "", ""]);
-  const [focusedIndex, setFocusedIndex] = useState<number | null>(0); // Track focused input
+  const [focusedIndex, setFocusedIndex] = useState<number | null>(0);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [resendModalVisible, setResendModalVisible] = useState(false);
@@ -155,7 +155,7 @@ export default function loginCodeVerify() {
       await apiClient.post("/auth/request-code", {
         email: email,
       });
-      setCode(["", "", "", ""]); // Clear inputs
+      setCode(["", "", "", ""]);
       inputRefs.current[0]?.focus(); // Focus first input
     } catch (err: any) {
       setError(err.message || "Could not resend code.");

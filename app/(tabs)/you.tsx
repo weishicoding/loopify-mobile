@@ -48,10 +48,7 @@ const YouPage: React.FC = () => {
     <SafeAreaWrapper>
       <View style={styles.container}>
         <ScrollView>
-          <YouHeader
-            username={profileData.username}
-            points={profileData.points}
-          />
+          <YouHeader />
 
           <View style={styles.contextContiner}>
             <YouStats

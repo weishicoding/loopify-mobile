@@ -3,18 +3,26 @@ import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { router } from "expo-router";
+import { useUser } from "@/context/UserProvider";
 
-interface YouHeaderProps {
-  username: string;
-  points: number;
-}
-
-const YouHeader: React.FC<YouHeaderProps> = ({ username, points }) => {
+const YouHeader: React.FC = () => {
+  const { currentUser } = useUser();
+  const handleSetting = () => {
+    router.push({
+      pathname: "/setting",
+    });
+  };
+  const handleProfile = () => {
+    router.push({
+      pathname: "/profile",
+      params: { userId: currentUser?.id },
+    });
+  };
   return (
     <View style={styles.profileHeader}>
       <TouchableOpacity
         style={styles.profileLeftSection}
-        onPress={() => router.push("/profile")}
+        onPress={handleProfile}
       >
         <Image
           source="https://picsum.photos/seed/696/3000/2000"
@@ -22,10 +30,10 @@ const YouHeader: React.FC<YouHeaderProps> = ({ username, points }) => {
           contentFit="cover"
         />
         <View style={styles.profileInfo}>
-          <Text style={styles.username}>{username}</Text>
+          <Text style={styles.username}>{currentUser?.nickname}</Text>
         </View>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.settingsButton}>
+      <TouchableOpacity style={styles.settingsButton} onPress={handleSetting}>
         <Ionicons name="settings-outline" size={20} color="black" />
       </TouchableOpacity>
     </View>

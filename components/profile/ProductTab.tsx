@@ -37,17 +37,13 @@ const ProductTab: React.FC<ProductTabProps> = ({
               ]}
             >
               {tab.label}
-              {tab.superscript && (
-                <Text style={styles.superscript}>{tab.superscript}</Text>
-              )}
             </Text>
           </TouchableOpacity>
         ))}
       </View>
-
       {showSearch && (
         <TouchableOpacity style={styles.searchButton}>
-          <Ionicons name="search" size={24} color="#333" />
+          <Ionicons name="search-outline" size={20} color="black" />
         </TouchableOpacity>
       )}
     </View>
@@ -57,16 +53,15 @@ const ProductTab: React.FC<ProductTabProps> = ({
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    backgroundColor: "white",
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    justifyContent: "space-between",
   },
   tabContainer: {
     flex: 1,
     flexDirection: "row",
   },
   tab: {
-    flex: 1,
+    flexDirection: "row",
+    paddingHorizontal: 10,
     paddingVertical: 15,
     alignItems: "center",
     justifyContent: "center",
@@ -76,7 +71,7 @@ const styles = StyleSheet.create({
     borderBottomColor: "#FFCC00",
   },
   tabLabel: {
-    fontSize: 16,
+    fontSize: 14,
     color: "#666",
   },
   activeTabLabel: {
@@ -92,7 +87,6 @@ const styles = StyleSheet.create({
   },
   searchButton: {
     width: 50,
-    alignItems: "center",
     justifyContent: "center",
   },
 });

@@ -6,6 +6,7 @@ import {
 } from "react-native-safe-area-context";
 import { ThemeProvider } from "@/context/ThemeProvider";
 import { AuthProvider } from "@/context/AuthProvider";
+import { UserProvider } from "@/context/UserProvider";
 
 export default function RootLayout() {
   useFonts({
@@ -17,9 +18,11 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <AuthProvider>
-        <ThemeProvider>
-          <Stack screenOptions={{ headerShown: false }} />
-        </ThemeProvider>
+        <UserProvider>
+          <ThemeProvider>
+            <Stack screenOptions={{ headerShown: false }} />
+          </ThemeProvider>
+        </UserProvider>
       </AuthProvider>
     </SafeAreaProvider>
   );
