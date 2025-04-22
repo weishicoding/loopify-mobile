@@ -4,7 +4,7 @@ import { router } from "expo-router";
 
 const ACCESS_TOKEN_KEY = "userAuthToken";
 
-const API_BASE_URL = "http://192.168.31.70:8080/api/v1";
+const API_BASE_URL = "http://192.168.31.70:8888/api/v1";
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
